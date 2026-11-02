@@ -41,11 +41,6 @@ flowchart LR
     CAM -.->|/ground_truth/cross_track_error| LOG["logging only"]
 ```
 
-<details><summary>Viewing in the GitHub app? Tap for the diagram as an image</summary>
-
-<p align="center"><img src="docs/pipeline_diagram.png" width="100%" alt="Pipeline: camera sim to perception to control"></p>
-
-</details>
 
 There's no MPC in here. The centroid baseline skips the bird's-eye/RANSAC part and uses its own threshold + biggest contour.
 
