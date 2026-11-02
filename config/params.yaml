@@ -1,0 +1,32 @@
+camera_sim:
+  ros__parameters:
+    track: technical        # oval_chicane | figure_eight | technical
+    condition: clean        # clean | hard (glare, shadows, light changes, more noise)
+    rate_hz: 30.0
+    seed: 0
+
+line_perception:
+  ros__parameters:
+    calibration_file: ""    # results/calibration.json from experiments/calibrate_camera.py
+    f_min: 0.16             # bird's-eye window, metres ahead of the robot centre
+    f_max: 0.66
+    y_half: 0.25
+    bev_res: 0.004          # 4 mm per bird's-eye pixel
+    bg_kernel: 15           # closing kernel that wipes out the 19 mm line to get the floor brightness
+    ratio_thresh: 0.66      # pixel / local background below this = line
+    min_blob: 12
+    n_windows: 10
+    win_margin: 0.045
+    min_pix: 6
+    ransac_iters: 40
+    ransac_tol: 0.008
+    min_inliers: 18
+    ema: 0.55
+    max_hold: 15            # frames to coast on the last fit through gaps and glare
+    look_f: 0.30
+
+line_control:
+  ros__parameters:
+    controller: stanley_ff  # pid | pure_pursuit | stanley_ff
+    speed: 0.19
+    max_lost_frames: 30
