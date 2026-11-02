@@ -2,9 +2,14 @@
 
 Camera-based line following for a TurtleBot3 Waffle Pi-style robot, ROS 2 Humble style. I wanted to see how far a proper OpenCV pipeline (calibration, bird's-eye view, sliding windows, RANSAC fit) gets you compared to the usual "threshold + biggest contour + PID" line follower, and whether the steering law still matters once the perception is decent. I ran 4 controllers over 3 tracks, clean and hard lighting, 3 speeds and 3 seeds, so 216 runs, and measured everything against sim ground truth.
 
-<!-- DEMO_GIF -->
+<img width="540" height="540" alt="linkedin_post4" src="https://github.com/user-attachments/assets/9c14ae37-4662-4e81-9da4-2f5020521001" />
 
-<!-- DEMO_VIDEO -->
+
+
+
+https://github.com/user-attachments/assets/72a48c99-5f81-47e5-8465-29738104b1bf
+
+
 
 *Stanley + feedforward on the technical track under soft shadows and glare, next to the centroid baseline losing the line on the figure eight.*
 
