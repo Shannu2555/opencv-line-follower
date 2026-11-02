@@ -21,10 +21,6 @@ Everything after the camera image is real OpenCV code that would run the same on
 
 ## Pipeline
 
-<p align="center"><img src="docs/pipeline_diagram.png" width="100%" alt="Pipeline: camera sim to perception to control"></p>
-
-<details><summary>Diagram source</summary>
-
 ```mermaid
 flowchart LR
     CAM["camera_sim<br/>(robot + floor + lens)"] -->|/camera/image_raw<br/>/camera/camera_info| UND["undistort<br/>cv2.remap"]
@@ -44,6 +40,10 @@ flowchart LR
     P -.->|/line/debug_bev| DBG["rqt / debug view"]
     CAM -.->|/ground_truth/cross_track_error| LOG["logging only"]
 ```
+
+<details><summary>Viewing in the GitHub app? Tap for the diagram as an image</summary>
+
+<p align="center"><img src="docs/pipeline_diagram.png" width="100%" alt="Pipeline: camera sim to perception to control"></p>
 
 </details>
 
