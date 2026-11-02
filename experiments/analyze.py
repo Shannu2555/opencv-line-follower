@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 P = os.path.join(ROOT, "plots")
 os.makedirs(P, exist_ok=True)
+plt.rcParams.update({"font.size": 14, "axes.titlesize": 16, "axes.labelsize": 15, "xtick.labelsize": 14, "ytick.labelsize": 14, "legend.fontsize": 14, "figure.titlesize": 16})
 COL = {"centroid_pid": "#64748b", "pid": "#f97316", "pure_pursuit": "#16a34a", "stanley_ff": "#2563eb"}
 LBL = {"centroid_pid": "Baseline: threshold + centroid + PID", "pid": "Bird's-eye fit + PID",
        "pure_pursuit": "Bird's-eye fit + pure pursuit", "stanley_ff": "Bird's-eye fit + Stanley + curvature FF"}
@@ -64,7 +65,7 @@ print(piv)
 print(fair.round(2))
 
 # ---- plot 1: completion rate by track and speed ----
-fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
+fig, axes = plt.subplots(1, 3, figsize=(12, 4.8), sharey=True)
 w = 0.2
 for ax, tr in zip(axes, TRACKS):
     d = df[df.track == tr]
@@ -76,9 +77,10 @@ for ax, tr in zip(axes, TRACKS):
     ax.set_title(tr.replace("_", " "))
     ax.set_ylim(0, 105)
 axes[0].set_ylabel("laps completed (%)")
-axes[0].legend(frameon=False, fontsize=9, loc="lower left")
+h, l = axes[0].get_legend_handles_labels()
+fig.legend(h, l, frameon=False, fontsize=15, loc="lower center", ncol=4, bbox_to_anchor=(0.5, 0.0))
 fig.suptitle(f"Completion rate (clean + hard lighting, {n} seeds each = {2*n} laps per bar)")
-fig.tight_layout()
+fig.tight_layout(rect=(0, 0.09, 1, 1))
 fig.savefig(os.path.join(P, "completion_rate.png"))
 
 # ---- plot 2: cross-track RMS vs speed (completed laps) ----
@@ -93,7 +95,7 @@ for ax, tr in zip(axes, TRACKS):
     ax.set_title(tr.replace("_", " "))
     ax.set_xlabel("speed (m/s)")
 axes[0].set_ylabel("cross-track RMS (cm)")
-axes[0].legend(frameon=False, fontsize=9)
+axes[0].legend(frameon=False, fontsize=13)
 fig.suptitle("Cross-track error vs speed (completed laps, mean ± std over seeds and lighting)")
 fig.tight_layout()
 fig.savefig(os.path.join(P, "cte_rms_vs_speed.png"))
@@ -108,11 +110,11 @@ for c in CTRLS:
         ax.plot(L.t.iloc[-1], L.cte.iloc[-1] * 100, "x", color="#dc2626", ms=10, mew=2.5)
 ax.axhline(12, color="#dc2626", ls="--", lw=1)
 ax.axhline(-12, color="#dc2626", ls="--", lw=1)
-ax.text(0.3, 12.4, "off-track limit ±12 cm", color="#dc2626", fontsize=9)
+ax.text(0.3, 12.4, "off-track limit ±12 cm", color="#dc2626", fontsize=13)
 ax.set_xlabel("time (s)")
 ax.set_ylabel("cross-track error (cm)")
 ax.set_title("Technical track, hard lighting, 0.19 m/s, seed 0 (red x = left the line)")
-ax.legend(frameon=False, ncol=4, fontsize=9, loc="lower right")
+ax.legend(frameon=False, ncol=4, fontsize=13, loc="lower right")
 fig.tight_layout()
 fig.savefig(os.path.join(P, "cte_trace_technical_hard.png"))
 
@@ -133,7 +135,7 @@ ax.hist(lat[1], bins=np.linspace(0, 8, 81), color=COL["stanley_ff"], alpha=0.8,
 ax.set_xlabel("perception time per frame (ms), 320x240, one CPU core")
 ax.set_ylabel("frames")
 ax.set_title("Per-frame perception latency")
-ax.legend(frameon=False, fontsize=9)
+ax.legend(frameon=False, fontsize=11)
 fig.tight_layout()
 fig.savefig(os.path.join(P, "perception_latency.png"))
 
@@ -152,7 +154,7 @@ ax.set_aspect("equal")
 ax.set_xlabel("x (m)")
 ax.set_ylabel("y (m)")
 ax.set_title("Driven paths, technical track, hard lighting, 0.26 m/s (red x = off track)")
-ax.legend(frameon=False, fontsize=8, loc="upper center", ncol=3)
+ax.legend(frameon=False, fontsize=12, loc="upper center", ncol=3)
 fig.tight_layout()
 fig.savefig(os.path.join(P, "paths_technical_fast.png"))
 
@@ -163,7 +165,7 @@ keys = list(pa)
 x = np.arange(len(keys))
 for k, (dist, colr) in enumerate([("20cm", "#0ea5e9"), ("30cm", "#6366f1"), ("45cm", "#a855f7")]):
     ax.bar(x + (k - 1) * 0.27, [pa[q]["rms_mm"][dist] for q in keys], 0.27, color=colr, label=f"{dist} ahead")
-ax.set_xticks(x, [q.replace("_", " ").replace("/", "\n") for q in keys], fontsize=9)
+ax.set_xticks(x, [q.replace("_", " ").replace("/", "\n") for q in keys], fontsize=12)
 ax.set_ylabel("lateral error RMS (mm)")
 ax.set_title("Line fit vs true centreline (static poses, calibrated camera)")
 ax.legend(frameon=False)

@@ -24,6 +24,7 @@ HONEST = "TurtleBot3 Waffle Pi-style robot modelled in my own sim  ·  real Open
 BG = (248, 250, 252); TXT = (15, 23, 42); MUTE = (71, 85, 105); PANEL = (255, 255, 255); EDGE = (203, 213, 225)
 C_ROBOT = (14, 165, 233); C_ROBOT_EDGE = (8, 47, 73); C_FOV = (250, 204, 21); C_FIT = (217, 70, 239)
 C_WIN = (34, 211, 238); C_MASK = (34, 197, 94); C_OFF = (220, 38, 38)
+C_AMBER = (245, 158, 11); C_DARK = (15, 23, 42)
 C_CTRL = {"centroid_pid": (100, 116, 139), "pid": (249, 115, 22), "pure_pursuit": (22, 163, 74), "stanley_ff": (37, 99, 235)}
 LBL = {"centroid_pid": "Baseline: threshold + centroid + PID", "pid": "Bird's-eye fit + PID",
        "pure_pursuit": "Bird's-eye fit + pure pursuit", "stanley_ff": "Bird's-eye fit + Stanley + curvature FF"}
@@ -232,7 +233,7 @@ class RunScene:
                 (TOP[0] + 8, TOP[1] + 6, f"Whole track, top view (robot drawn {TOP_SCALE:g}x)", f("sb", 13), TXT, "la")])
         if frozen and self.freeze_note:
             pm = TOP[0] + (x + FLOOR_W / 2) / FLOOR_W * tw, TOP[1] + (FLOOR_H / 2 - y) / FLOOR_H * th_
-            cv2.circle(c.a, (s_(pm[0]), s_(pm[1])), s_(18), C_OFF, s_(3), cv2.LINE_AA)
+            cv2.circle(c.a, (s_(pm[0]), s_(pm[1])), s_(18), C_AMBER, s_(4), cv2.LINE_AA)
         # right column: camera + bird's-eye
         X0, CW = 776, 284
         c.text([(X0, 100, "Robot camera (raw, lens distortion)", f("sb", 14), TXT, "la")])
@@ -334,7 +335,7 @@ class RunScene:
         c.rect(X1, Y1, X2, Y2, EDGE, fill=False, w=1)
         T = max(self.t_end, 1.0)
         ymap = lambda v: (Y1 + Y2) / 2 + 8 - v / 0.15 * (Y2 - Y1) / 2 * 0.72
-        xmap = lambda t: X1 + 46 + (X2 - X1 - 56) * t / T
+        xmap = lambda t: X1 + 50 + (X2 - X1 - 56) * t / T
         for lv in (-0.12, 0.12):
             for xs in np.arange(xmap(0), X2 - 10, 14):
                 cv2.line(c.a, (s_(xs), s_(ymap(lv))), (s_(xs + 7), s_(ymap(lv))), C_OFF, s_(1.2), cv2.LINE_AA)
@@ -342,23 +343,24 @@ class RunScene:
         if i > 1:
             poly(c, np.column_stack([xmap(self.ts[:i + 1]), ymap(self.cte_hist[:i + 1])]), col, 2.0)
         cv2.circle(c.a, (s_(xmap(self.ts[i])), s_(ymap(self.cte_hist[i]))), s_(4.5), col, -1, cv2.LINE_AA)
-        c.text([(X1 + 10, Y1 + 8, "Cross-track error vs ground truth (cm)", f("sb", 14), TXT, "la"),
-                (X1 + 40, ymap(0.12), "+12", f("r", 12), C_OFF, "rm"), (X1 + 40, ymap(-0.12), "-12", f("r", 12), C_OFF, "rm"),
-                (X1 + 40, ymap(0), "0", f("r", 12), MUTE, "rm"), (X2 - 10, Y2 - 8, f"time (s) · run length {T:.0f} s", f("r", 12), MUTE, "rd"),
-                (X1 + 52, Y2 - 8, "red dashes = off-track limit", f("r", 12), C_OFF, "ld")])
+        c.text([(X1 + 10, Y1 + 6, "Cross-track error vs ground truth (cm)", f("sb", 16), TXT, "la"),
+                (X1 + 40, ymap(0.12), "+12", f("sb", 17), C_OFF, "rm"), (X1 + 40, ymap(-0.12), "-12", f("sb", 17), C_OFF, "rm"),
+                (X1 + 40, ymap(0), "0", f("sb", 17), MUTE, "rm"), (X2 - 10, Y2 - 6, f"time (s) · run length {T:.0f} s", f("r", 15), MUTE, "rd"),
+                (X1 + 52, Y2 - 6, "red dashes = off-track limit", f("r", 15), C_OFF, "ld")])
         # progress bar
         c.rect(20, 1016, 1060, 1023, (226, 232, 240), radius=3)
         c.rect(20, 1016, 20 + 1040 * (i + 1) / len(self.fr), 1023, col, radius=3)
         c.text([(20, 1040, HONEST, f("r", 13), MUTE, "lm"), (1060, 1040, NAME, f("sb", 14), TXT, "rm")])
         if frozen and self.freeze_note:
             k = min(1.0, kf / 8)
-            ov = c.a.copy()
-            cv2.rectangle(ov, (s_(CH[0] + 20), s_(CH[3] - 96)), (s_(CH[2] - 20), s_(CH[3] - 16)), (254, 242, 242), -1)
-            c.a = cv2.addWeighted(ov, 0.94 * k, c.a, 1 - 0.94 * k, 0)
-            if k > 0.5:
-                c.rect(CH[0] + 20, CH[3] - 96, CH[2] - 20, CH[3] - 16, C_OFF, fill=False, w=2)
-                c.text([(CH[0] + 40, CH[3] - 76, self.freeze_note[0], f("b", 20), C_OFF, "la"),
-                        (CH[0] + 40, CH[3] - 46, self.freeze_note[1], f("r", 15), TXT, "la")])
+            bx0, by0, bx1, by1 = CH[0] + 40, CH[3] - 118, CH[2] - 40, CH[3] - 22
+            base = c.a.copy()
+            c.rect(bx0, by0, bx1, by1, C_AMBER, radius=16)
+            c.rect(bx0 + 3, by0 + 3, bx1 - 3, by1 - 3, C_DARK, radius=13)
+            c.rect(bx0 + 22, by0 + 24, bx0 + 28, by1 - 24, C_AMBER, radius=3)
+            c.text([(bx0 + 46, by0 + 22, self.freeze_note[0], f("b", 26), C_AMBER, "la"),
+                    (bx0 + 46, by0 + 62, self.freeze_note[1], f("r", 18), (226, 232, 240), "la")])
+            c.a = (c.a.astype(np.float32) * k + base.astype(np.float32) * (1 - k)).astype(np.uint8)
         return c.out()
 
 
@@ -372,11 +374,30 @@ def card_title(k, n):
             (90, 506, "PID vs pure pursuit vs Stanley with curvature feed-forward", f("r", 22), TXT, "la"),
             (90, 542, "216 laps: 3 tracks · glare, shadows, light changes · 3 speeds · 3 seeds", f("r", 22), TXT, "la"),
             (90, 700, NAME, f("b", 30), TXT, "la"),
-            (90, 742, "BTech Robotics & AI · Amrita School of Engineering, Bengaluru", f("r", 20), MUTE, "la"),
             (90, 940, HONEST, f("r", 16), MUTE, "la")])
     for j, cl in enumerate(C_CTRL.values()):
         c.rect(90 + j * 70, 610, 146 + j * 70, 618, cl, radius=4)
     return fade(c.out(), min(1, k / 12, (n - k) / 10))
+
+
+def card_end(k, n):
+    c = Canvas()
+    c.rect(0, 0, W, 10, C_CTRL["stanley_ff"])
+    c.text([(90, 330, NAME, f("b", 50), TXT, "la"),
+            (90, 410, "Camera-based line following for a small diff-drive robot", f("m", 28), MUTE, "la"),
+            (90, 452, "OpenCV · bird's-eye RANSAC fit · PID vs pure pursuit vs Stanley + FF", f("r", 22), TXT, "la")])
+    for j, cl in enumerate(C_CTRL.values()):
+        c.rect(90 + j * 70, 520, 146 + j * 70, 528, cl, radius=4)
+    c.rect(90, 580, 990, 660, PANEL, radius=14)
+    c.rect(90, 580, 990, 660, EDGE, fill=False, w=1.5, radius=14)
+    c.text([(120, 620, "Code:", f("sb", 26), MUTE, "lm"), (210, 620, "github.com/Shannu2555/opencv-line-follower", f("b", 28), TXT, "lm"),
+            (90, 940, HONEST, f("r", 16), MUTE, "la")])
+    img = fade(c.out(), min(1, k / 10))
+    nb = 21  # last 0.7 s fades to black
+    if k >= n - nb:
+        a = (n - 1 - k) / nb
+        img = (img.astype(np.float32) * max(a, 0)).astype(np.uint8)
+    return img
 
 
 def card_image(title, sub, path, k, n, note=None):
@@ -449,8 +470,8 @@ def scenes():
         sc = RunScene(name, t, sub, plan)
         s = sc.s
         if s["status"] != "completed":
-            sc.freeze_note = (f"Left the line after {s['distance']:.1f} m ({100*s['frac_done']:.0f}% of the lap)",
-                              f"cross-track error hit {abs(sc.cte_hist[-1])*100:.0f} cm · lap counted as failed")
+            sc.freeze_note = (f"Lost the line after {s['distance']:.1f} m",
+                              f"{100*s['frac_done']:.0f}% of the lap · cross-track error hit {abs(sc.cte_hist[-1])*100:.0f} cm · lap failed")
         else:
             sc.freeze_note = None
         out.append((name, sc.n_frames(), (lambda sc: (lambda k, n: fade(sc.frame(k), min(1, (k + 1) / 6, (n - k) / 6))))(sc)))
@@ -469,7 +490,7 @@ def scenes():
         [330, 105, 125, 110, 110, 110, 100],
         ["Errors are against simulator ground truth, completed laps only (so a controller that", "finishes more of the hard laps is graded on harder laps).",
          "Latency: median per frame, 320×240, one CPU core."])))
-    charts = [("completion_rate", "Where each controller makes it round", "Completion rate by track and speed"),
+    charts = [("completion_rate", "Track completion by controller", "Completion rate by track and speed"),
               ("cte_trace_technical_hard", "Cross-track error, same lap", "Technical track, hard lighting, 0.19 m/s"),
               ("paths_technical_fast", "Driven paths at 0.26 m/s", "Technical track, hard lighting"),
               ("cte_rms_vs_speed", "Tracking error vs speed", "Completed laps, mean ± std"),
@@ -477,6 +498,7 @@ def scenes():
               ("perception_latency", "Perception time per frame", "Undistort + bird's-eye + mask + windows + RANSAC")]
     for fn, t, sub in charts:
         out.append((fn, 8 * FPS, (lambda fn, t, sub: (lambda k, n: card_image(t, sub, os.path.join(ROOT, "plots", fn + ".png"), k, n)))(fn, t, sub)))
+    out.append(("end", 4 * FPS, lambda k, n: card_end(k, n)))
     return out
 
 
@@ -484,6 +506,8 @@ def main():
     master = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "video", "master.mp4")
     only = sys.argv[2] if len(sys.argv) > 2 else None
     sc = scenes()
+    if only and only.startswith("--scene="):
+        sc = [x for x in sc if x[0] == only.split("=", 1)[1]]
     total = sum(n for _, n, _ in sc)
     print(f"{len(sc)} scenes, {total} frames, {total/FPS:.1f} s", flush=True)
     if only == "--stills":
