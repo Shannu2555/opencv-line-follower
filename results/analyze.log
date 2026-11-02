@@ -1,0 +1,23 @@
+  controller  runs  completed completion clean  hard cte_rms_cm cte_max_cm head_rms_deg lat_med_ms lat_p95_ms
+Centroid PID    54         27        50% 24/27  3/27       0.88       11.2          1.7       0.09       0.13
+   Fit + PID    54         52        96% 27/27 25/27       2.64       10.5          2.5       1.93       2.21
+Pure pursuit    54         51        94% 27/27 24/27       0.86       12.0          1.9       1.92       2.18
+Stanley + FF    54         49        91% 25/27 24/27       0.48        8.8          1.0       1.93       2.18
+controller          centroid_pid  pid  pure_pursuit  stanley_ff
+track        speed                                             
+figure_eight 0.12              0    6             6           6
+             0.19              3    6             6           6
+             0.26              3    6             6           6
+oval_chicane 0.12              3    6             6           6
+             0.19              6    6             6           6
+             0.26              3    6             6           6
+technical    0.12              3    6             5           1
+             0.19              3    5             5           6
+             0.26              3    5             5           6
+              cte_rms_cm  cte_max_cm  head_rms_deg  lap_time
+controller                                                  
+centroid_pid        0.78        2.86          1.60     63.69
+pid                 2.27        5.26          2.08     62.53
+pure_pursuit        0.84        3.33          1.82     63.82
+stanley_ff          0.47        1.58          0.97     64.19
+plots written
