@@ -1,0 +1,23 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  unit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -r requirements.txt flake8
+      - run: flake8 line_follower experiments tests --max-line-length 120 --extend-ignore E203,E741 --exclude line_follower/nodes
+      - run: pytest -q tests
+  ros2-build:
+    runs-on: ubuntu-22.04
+    container: ros:humble
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src/line_follower
+      - run: apt-get update && apt-get install -y python3-opencv python3-scipy ros-humble-cv-bridge
+      - shell: bash
+        run: source /opt/ros/humble/setup.bash && colcon build --packages-select line_follower
